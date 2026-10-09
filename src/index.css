@@ -1,0 +1,4 @@
+body {
+  background-color: var(--color-slate-900)
+    /* oklch(20.8% 0.042 265.755) = #0f172b */;
+}
