@@ -1,4 +1,38 @@
 body {
-  background-color: var(--color-slate-900)
-    /* oklch(20.8% 0.042 265.755) = #0f172b */;
+  background: #16171d;
+  color: aliceblue;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+header {
+  margin-top: 1rem;
+}
+
+.hyphen {
+  margin: 5px;
+}
+
+.jobfield {
+  margin: 5px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  transform: scaleX(0.8);
+  transformorigin: "left";
+}
+
+.name {
+  margin: 5px 5px 5px 5px;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: radial-gradient(orange, #ff7300);
 }
