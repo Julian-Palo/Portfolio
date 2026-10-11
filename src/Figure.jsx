@@ -7,7 +7,7 @@ const Figure = () => {
         <button>Agentically Built 3D Platformer</button>
         <button>React API app </button>
         <button>Grocery list using CRUD</button>
-        <button>C# Currecny Converter</button>
+        <button>C# Currency Converter</button>
       </ul>
     </nav>
   );

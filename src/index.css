@@ -3,6 +3,13 @@ body {
   color: aliceblue;
 }
 
+.contact {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1000;
+}
+
 header {
   display: flex;
   flex-direction: column;
@@ -35,4 +42,8 @@ nav {
   align-items: center;
   justify-content: center;
   background-image: radial-gradient(orange, #ff7300);
+}
+
+.languages {
+  color: orange;
 }
