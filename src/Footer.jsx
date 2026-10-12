@@ -10,7 +10,7 @@ const links = [
 const Footer = () => {
   return (
     <footer id="contact">
-      <p className="footer-lead">Let's build something.</p>
+      <p className="footer-lead">Let's get building.</p>
       <ul className="footer-links">
         {links.map(({ label, href }) => (
           <li key={label}>

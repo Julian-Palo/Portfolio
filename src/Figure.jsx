@@ -1,10 +1,9 @@
 import { useEffect, useRef } from "react";
 import paragonalPreview from "./assets/preview-paragonal.png";
 import reactApiPreview from "./assets/preview-react-api.png";
-import heroBase from "./assets/hero.png";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "./assets/vite.svg";
 import currencyPreview from "./assets/preview-currency.png";
+import immpressionPreview from "./assets/immpression.png";
+import Julian from "./Julian";
 
 // Vite's starter-template art: the React and Vite logos laid onto the two tiles of hero.png
 const ViteReactStack = () => (
@@ -20,19 +19,19 @@ const ViteReactStack = () => (
 // `preview` pops up above the box on hover: an image, or an element to show as-is.
 const projects = [
   {
-    title: "Paragonal",
+    title: "Immpression contributions",
     blurb:
-      "An agentically built 3D platformer. Built with Google Gemini's Antigravity IDE to test skills acquired from the Google AI Professional Certification",
-    href: "https://gamejolt.com/games/Paragonal/1101374",
-    source: "Game Jolt",
+      "I pitched users to upload their art to the app and website while building a virtual whiteboard that other users can scribble and interact artistically",
+    href: "https://www.immpression.art/",
+    source: "Immpression",
     slot: "slot-2",
-    preview: paragonalPreview,
+    preview: immpressionPreview,
     at: 0.9,
   },
   {
     title: "React API App",
     blurb:
-      "Fetches JSON from an API and reshapes it with the Fetch API, useState, and useEffect.",
+      "Fetches JSON from an API and reshapes it with the Fetch API, useState, and useEffect",
     href: "https://github.com/Julian-Palo/React-JSON-Manipulation",
     source: "GitHub",
     slot: "slot-3",
@@ -40,19 +39,19 @@ const projects = [
     at: 0.5,
   },
   {
-    title: "First React Project",
+    title: "Paragonal",
     blurb:
-      "React fundamentals in one app: components, props, state, click events, lists, and controlled inputs.",
-    href: "https://github.com/Julian-Palo/First-React-Project",
-    source: "GitHub",
+      "An agentically built 3D platformer. Built with Google Gemini's Antigravity IDE to test skills acquired from the Google AI Professional Certification",
+    href: "https://gamejolt.com/games/Paragonal/1101374",
+    source: "Game Jolt",
     slot: "slot-4",
-    preview: <ViteReactStack />,
+    preview: paragonalPreview,
     at: 0.3,
   },
   {
     title: "C# Currency Converter",
     blurb:
-      "Converts amounts between currencies in real time with C# and SQL, and saves your own custom currencies to a local database.",
+      "Converts amounts between currencies in real time with C# and SQL, and saves your own custom currencies to a local database",
     href: "https://github.com/Julian-Palo/CurrencyConverter_Static",
     source: "GitHub",
     slot: "slot-5",
@@ -65,12 +64,14 @@ const projects = [
 // and hooks over the top. The visible ribbon is an outline built around this line.
 const CENTERLINE =
   "M1480 470 C1250 400 1100 520 900 570 C700 620 520 680 380 620 " +
-  "C250 565 215 430 235 310 C255 190 340 120 430 130 C520 140 560 220 540 300";
+  "C210 565 165 430 190 310 C215 190 320 120 430 130 C520 140 560 220 540 300";
 // Extends the tail off to the right, so the ribbon still reaches the edge of wide screens
 const LEAD_IN = "M3400 560 L2200 560 C1900 560 1710 540 1480 470";
 const SAMPLES = 400;
 const LEAD_IN_SAMPLES = 120;
 const TIP_RADIUS = 65;
+// How far inside the ribbon's edge Julian's fist sits, so it overlaps the ribbon
+const GRIP_INSET = 26;
 
 // Ribbon thickness at a point along the centerline (0 = start, 1 = tip of the curl).
 // Even along the tail, then swells smoothly through the curl.
@@ -86,6 +87,7 @@ const Figure = () => {
   const leadInRef = useRef(null);
   const bodyRef = useRef(null);
   const tipRef = useRef(null);
+  const julianRef = useRef(null);
 
   // Ties the ribbon's growth to scroll position: grows on the way down, shrinks on the way back up
   useEffect(() => {
@@ -118,10 +120,26 @@ const Figure = () => {
       const dy = after.y - before.y;
       const scale = widths[i] / 2 / (Math.hypot(dx, dy) || 1);
       return {
-        left: `${(point.x - dy * scale).toFixed(1)} ${(point.y + dx * scale).toFixed(1)}`,
-        right: `${(point.x + dy * scale).toFixed(1)} ${(point.y - dx * scale).toFixed(1)}`,
+        left: { x: point.x - dy * scale, y: point.y + dx * scale },
+        right: { x: point.x + dy * scale, y: point.y - dx * scale },
       };
     });
+    const toPath = ({ x, y }) => `${x.toFixed(1)} ${y.toFixed(1)}`;
+
+    // Julian grips the ribbon's leftmost point (its outer edge, halfway down the curl), with his
+    // fist a little inside the edge so it overlaps the ribbon. Placed in % of the viewBox.
+    const leftmost = edges
+      .flatMap((edge) => [edge.left, edge.right])
+      .reduce((best, edge) => (edge.x < best.x ? edge : best));
+    const view = svg.viewBox.baseVal;
+    hero.style.setProperty(
+      "--grip-x",
+      `${((leftmost.x + GRIP_INSET - view.x) / view.width) * 100}%`,
+    );
+    hero.style.setProperty(
+      "--grip-y",
+      `${((leftmost.y - view.y) / view.height) * 100}%`,
+    );
     const slots = hero.querySelectorAll(".slot");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
@@ -129,7 +147,8 @@ const Figure = () => {
     const update = () => {
       frame = 0;
       let raw;
-      if (getComputedStyle(hero).position === "sticky") {
+      const pinned = getComputedStyle(hero).position === "sticky";
+      if (pinned) {
         // The ribbon is pinned on screen while you scroll through the track:
         // 0 when it first pins, 1 when it's about to scroll away
         const pinnedAt = parseFloat(getComputedStyle(hero).top);
@@ -155,8 +174,8 @@ const Figure = () => {
       // Outline of the ribbon up to how far it has grown
       const count = entry + Math.round(progress * (last - entry));
       const shown = edges.slice(0, count + 1);
-      const left = shown.map((edge) => edge.left);
-      const right = shown.map((edge) => edge.right).reverse();
+      const left = shown.map((edge) => toPath(edge.left));
+      const right = shown.map((edge) => toPath(edge.right)).reverse();
       body.setAttribute(
         "d",
         progress > 0 ? `M${left.join("L")}L${right.join("L")}Z` : "",
@@ -166,9 +185,17 @@ const Figure = () => {
       tip.setAttribute("cx", points[count].x);
       tip.setAttribute("cy", points[count].y);
       tip.setAttribute("r", progress > 0 ? widths[count] / 2 : 0);
-      slots.forEach((slot) =>
-        slot.classList.toggle("is-shown", progress >= Number(slot.dataset.at)),
-      );
+      // Small screens have no hover, so the box crossing the middle of the screen shows its preview
+      const middle = window.innerHeight / 2;
+      slots.forEach((slot) => {
+        slot.classList.toggle("is-shown", progress >= Number(slot.dataset.at));
+        const { top, bottom } = slot.getBoundingClientRect();
+        slot.classList.toggle(
+          "is-previewing",
+          !pinned && top <= middle && bottom >= middle,
+        );
+      });
+      julianRef.current.update(progress);
     };
 
     const requestUpdate = () => {
@@ -208,9 +235,9 @@ const Figure = () => {
               x2="1412"
               y2="700"
             >
-              <stop offset="0%" stopColor="#ffb21a" />
+              <stop offset="0%" stopColor="#ff7a00" />
               <stop offset="55%" stopColor="#ffa500" />
-              <stop offset="100%" stopColor="#ff7a00" />
+              <stop offset="100%" stopColor="#ffb21a" />
             </linearGradient>
           </defs>
           <path ref={leadInRef} d={LEAD_IN} fill="none" />
@@ -218,6 +245,8 @@ const Figure = () => {
           <path ref={bodyRef} fill="url(#ribbon-fill)" />
           <circle ref={tipRef} fill="url(#ribbon-fill)" r="0" />
         </svg>
+
+        <Julian ref={julianRef} showAt={0.9} />
 
         <ul className="projects">
           {projects.map((project) => (
