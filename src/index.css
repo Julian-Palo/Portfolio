@@ -90,11 +90,19 @@ a {
 
 /* ---------- Hero: ribbon + boxes ---------- */
 
+/* Extra scroll room: the ribbon stays pinned on screen and grows while you scroll through it */
+.hero-track {
+  --hero-height: min(53.8vw, 94vh);
+  height: calc(var(--hero-height) + 120vh);
+}
+
 .hero {
-  position: relative;
+  position: sticky;
+  top: calc((100vh - var(--hero-height)) / 2);
   /* Matches the ribbon's viewBox so the boxes stay pinned to the ribbon */
   aspect-ratio: 1412 / 760;
-  margin-top: clamp(1.5rem, 4vw, 4rem);
+  max-width: 175vh;
+  margin: 0 auto;
   container-type: inline-size;
 }
 
@@ -103,17 +111,28 @@ a {
   inset: 0;
   width: 100%;
   height: 100%;
-  animation: ribbon-reveal 1.4s cubic-bezier(0.7, 0, 0.2, 1) both;
+  /* Lets the ribbon's tail reach past the section to the edge of wide screens */
+  overflow: visible;
 }
 
 .slot {
   position: absolute;
   display: flex;
-  animation: rise 0.7s var(--ease-out) both;
-  animation-delay: calc(0.6s + var(--i) * 0.12s);
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.5s var(--ease-out),
+    transform 0.5s var(--ease-out);
 }
 
-.slot-2 { left: 22.7%; top: 39.2%; width: 18.4%; min-height: 13.4%; }
+/* Shown once the ribbon grows past the box (toggled in Figure.jsx) */
+.slot.is-shown,
+.slot:focus-within {
+  opacity: 1;
+  transform: none;
+}
+
+.slot-2 { left: 18.5%; top: 36%; width: 18.4%; min-height: 13.4%; }
 .slot-3 { left: 47.1%; top: 63.8%; width: 9.8%; min-height: 16.3%; }
 .slot-4 { left: 69.8%; top: 51.3%; width: 10%; min-height: 12.6%; }
 .slot-5 { left: 84%; top: 49%; width: 10%; min-height: 12.6%; }
@@ -177,7 +196,10 @@ a.card:hover .card-meta {
 }
 
 header {
-  margin-top: 1rem;
+  /* Fills the first screen so the ribbon only shows once you scroll */
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 0 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -315,9 +337,15 @@ footer :focus-visible {
 /* ---------- Small screens: stack the boxes over the ribbon ---------- */
 
 @media (max-width: 760px) {
+  .hero-track {
+    height: auto;
+  }
+
   .hero {
+    position: relative;
+    top: 0;
     aspect-ratio: auto;
-    margin-top: 5rem;
+    max-width: none;
     padding: 2rem 16px 3rem;
   }
 
@@ -329,6 +357,8 @@ footer :focus-visible {
     position: static;
     width: auto;
     min-height: 0;
+    opacity: 1;
+    transform: none;
   }
 
   .projects {
@@ -352,16 +382,6 @@ footer :focus-visible {
 }
 
 /* ---------- Motion ---------- */
-
-@keyframes ribbon-reveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0 0 0 0); }
-}
-
-@keyframes rise {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: none; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

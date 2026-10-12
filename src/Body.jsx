@@ -1,4 +1,13 @@
-const languages = ["React", "HTML", "CSS", "JavaScript", "Python", "SQL", "C#"];
+const languages = [
+  "React",
+  "HTML",
+  "CSS",
+  "Tailwind CSS",
+  "JavaScript",
+  "Python",
+  "SQL",
+  "C#",
+];
 
 const Body = () => {
   return (
