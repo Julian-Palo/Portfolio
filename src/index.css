@@ -92,7 +92,7 @@ a {
 
 /* Extra scroll room: the ribbon stays pinned on screen and grows while you scroll through it */
 .hero-track {
-  --hero-height: min(53.8vw, 94vh);
+  --hero-height: min(53.7vw, 100vh);
   height: calc(var(--hero-height) + 120vh);
 }
 
@@ -100,8 +100,8 @@ a {
   position: sticky;
   top: calc((100vh - var(--hero-height)) / 2);
   /* Matches the ribbon's viewBox so the boxes stay pinned to the ribbon */
-  aspect-ratio: 1412 / 760;
-  max-width: 175vh;
+  aspect-ratio: 1332 / 715;
+  max-width: 186vh;
   margin: 0 auto;
   container-type: inline-size;
 }
@@ -132,10 +132,70 @@ a {
   transform: none;
 }
 
-.slot-2 { left: 18.5%; top: 36%; width: 18.4%; min-height: 13.4%; }
-.slot-3 { left: 47.1%; top: 63.8%; width: 9.8%; min-height: 16.3%; }
-.slot-4 { left: 69.8%; top: 51.3%; width: 10%; min-height: 12.6%; }
-.slot-5 { left: 84%; top: 49%; width: 10%; min-height: 12.6%; }
+/* Wide enough for a short summary in each box; they sit in the open space above the tail */
+.slot-2 { left: 12%; top: 34%; width: 24%; }
+.slot-3 { left: 38%; top: 58%; width: 17%; }
+.slot-4 { left: 60%; top: 43%; width: 16.5%; }
+.slot-5 { left: 80%; top: 36%; width: 16.5%; }
+
+/* Image that pops up above a box while it's hovered or focused */
+.card-preview {
+  position: absolute;
+  bottom: calc(100% + 1.2cqi);
+  left: 50%;
+  width: 13cqi;
+  height: 13cqi;
+  object-fit: contain;
+  object-position: bottom;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 12px) scale(0.92);
+  transform-origin: bottom;
+  filter: drop-shadow(0 8px 14px rgb(0 0 0 / 0.45));
+  transition:
+    opacity 0.3s var(--ease-out),
+    transform 0.3s var(--ease-out);
+}
+
+/* Vite's template layout (170 x 179px), in em so the whole stack scales with the preview */
+.vite-stack {
+  font-size: calc(13cqi / 179);
+  width: 170em;
+  height: 179em;
+}
+
+.vite-stack img {
+  position: absolute;
+  inset-inline: 0;
+  margin: 0 auto;
+}
+
+.vite-stack .base {
+  top: 0;
+  width: 170em;
+}
+
+.vite-stack .framework {
+  z-index: 1;
+  top: 34em;
+  height: 28em;
+  transform: perspective(2000em) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
+    scale(1.4);
+}
+
+.vite-stack .vite {
+  top: 107em;
+  height: 26em;
+  width: auto;
+  transform: perspective(2000em) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
+    scale(0.8);
+}
+
+.slot:hover .card-preview,
+.slot:focus-within .card-preview {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
 
 .card {
   flex: 1;
@@ -175,6 +235,8 @@ a.card:hover {
 }
 
 .card-blurb {
+  font-size: 0.9em;
+  line-height: 1.4;
   color: var(--ink-dim);
 }
 
@@ -283,8 +345,49 @@ header {
 }
 
 .certs li {
+  position: relative;
   padding: 0.9rem 0;
   border-bottom: 1px solid rgb(255 255 255 / 0.2);
+  transition: color 0.25s;
+}
+
+.certs li:hover {
+  color: var(--orange);
+}
+
+/* Certificate image shown above an item while it's hovered.
+   Which one is picked by the mouse position (see Body.jsx); --side (0 = left, 1 = right)
+   slides it toward that side and tilts it that way. */
+.cert-previews {
+  --preview-width: min(300px, 70%);
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% - 0.4rem);
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.cert-previews img {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--side) * (100% - var(--preview-width)));
+  width: var(--preview-width);
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.45);
+  opacity: 0;
+  transform: translateY(14px) scale(0.94);
+  transition:
+    opacity 0.3s var(--ease-out),
+    transform 0.35s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .certs li:hover .cert-previews img.is-shown {
+    opacity: 1;
+    transform: rotate(calc((var(--side) - 0.5) * 8deg));
+  }
 }
 
 .certs li:last-child {
@@ -374,6 +477,11 @@ footer :focus-visible {
 
   .card {
     font-size: 0.95rem;
+  }
+
+  /* No hover on touch screens, and no room above the stacked boxes */
+  .card-preview {
+    display: none;
   }
 
   .skills {

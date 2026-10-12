@@ -1,35 +1,62 @@
 import { useEffect, useRef } from "react";
+import paragonalPreview from "./assets/preview-paragonal.png";
+import reactApiPreview from "./assets/preview-react-api.png";
+import heroBase from "./assets/hero.png";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "./assets/vite.svg";
+import currencyPreview from "./assets/preview-currency.png";
+
+// Vite's starter-template art: the React and Vite logos laid onto the two tiles of hero.png
+const ViteReactStack = () => (
+  <div className="card-preview vite-stack">
+    <img className="base" src={heroBase} alt="" />
+    <img className="framework" src={reactLogo} alt="" />
+    <img className="vite" src={viteLogo} alt="" />
+  </div>
+);
 
 // Each project sits in one of the boxes drawn along the ribbon (see .slot-* in index.css).
 // `at` is how far the ribbon has to grow (0 to 1) before the box appears.
+// `preview` pops up above the box on hover: an image, or an element to show as-is.
 const projects = [
   {
     title: "Paragonal",
-    blurb: "Agentically built 3D platformer",
+    blurb:
+      "An agentically built 3D platformer. Built with Google Gemini's Antigravity IDE to test skills acquired from the Google AI Professional Certification",
     href: "https://gamejolt.com/games/Paragonal/1101374",
     source: "Game Jolt",
     slot: "slot-2",
+    preview: paragonalPreview,
     at: 0.9,
   },
   {
     title: "React API App",
+    blurb:
+      "Fetches JSON from an API and reshapes it with the Fetch API, useState, and useEffect.",
     href: "https://github.com/Julian-Palo/React-JSON-Manipulation",
     source: "GitHub",
     slot: "slot-3",
+    preview: reactApiPreview,
     at: 0.5,
   },
   {
     title: "First React Project",
+    blurb:
+      "React fundamentals in one app: components, props, state, click events, lists, and controlled inputs.",
     href: "https://github.com/Julian-Palo/First-React-Project",
     source: "GitHub",
     slot: "slot-4",
+    preview: <ViteReactStack />,
     at: 0.3,
   },
   {
     title: "C# Currency Converter",
+    blurb:
+      "Converts amounts between currencies in real time with C# and SQL, and saves your own custom currencies to a local database.",
     href: "https://github.com/Julian-Palo/CurrencyConverter_Static",
     source: "GitHub",
     slot: "slot-5",
+    preview: currencyPreview,
     at: 0.15,
   },
 ];
@@ -167,7 +194,7 @@ const Figure = () => {
       >
         <svg
           className="ribbon"
-          viewBox="0 0 1412 760"
+          viewBox="80 0 1332 715"
           preserveAspectRatio="xMinYMid slice"
           aria-hidden="true"
           focusable="false"
@@ -199,6 +226,11 @@ const Figure = () => {
               className={`slot ${project.slot}`}
               data-at={project.at}
             >
+              {typeof project.preview === "string" ? (
+                <img className="card-preview" src={project.preview} alt="" />
+              ) : (
+                project.preview
+              )}
               {project.href ? (
                 <a
                   className="card"
