@@ -1,23 +1,28 @@
-import React from "react";
+const languages = ["React", "HTML", "CSS", "JavaScript", "Python", "SQL", "C#"];
 
 const Body = () => {
   return (
-    <ul class="Skills">
-      <li>
+    <ul className="skills">
+      <li className="blob">
         <h2>Frontend Developer</h2>
         <p>
           I code from scratch, but I produce fast, building the website's bare
-          structure then polishing and deploying with claude
+          structure then polishing and deploying with Claude.
         </p>
-        <br />
-        <p className="languages">Languages I use:</p>
-        <p>React (HTML,CSS,JS), Python, SQL, C#</p>
+        <p className="languages">Languages I use</p>
+        <ul className="chips">
+          {languages.map((language) => (
+            <li key={language}>{language}</li>
+          ))}
+        </ul>
       </li>
 
-      <li>
-        <h2>Skills</h2>
-        <p>W3Schools C# and Java certification</p>
-        <p>Google AI Professional Certificate</p>
+      <li className="blob blob--alt">
+        <h2>Certifications</h2>
+        <ul className="certs">
+          <li>W3Schools C# and Java certification</li>
+          <li>Google AI Professional Certificate</li>
+        </ul>
       </li>
     </ul>
   );

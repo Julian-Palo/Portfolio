@@ -1,20 +1,31 @@
-import React from "react";
+const links = [
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/julian-palomino-ab4097260/",
+  },
+  { label: "GitHub", href: "https://github.com/Julian-Palo?tab=repositories" },
+  { label: "Email", href: "mailto:julian.l.palomino@gmail.com" },
+];
 
 const Footer = () => {
   return (
-    <footer>
-      <h1>
-        Linked in
-        <a href="https://www.linkedin.com/in/julian-palomino-ab4097260/?isSelfProfile=true"></a>
-      </h1>
-      <h1>
-        Github
-        <a href="https://github.com/Julian-Palo?tab=repositories"></a>
-      </h1>
-      <h1>
-        Email
-        <a href="julian.l.palomino@gmail.com"></a>
-      </h1>
+    <footer id="contact">
+      <p className="footer-lead">Let's build something.</p>
+      <ul className="footer-links">
+        {links.map(({ label, href }) => (
+          <li key={label}>
+            <a
+              href={href}
+              {...(href.startsWith("http") && {
+                target: "_blank",
+                rel: "noreferrer",
+              })}
+            >
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
     </footer>
   );
 };

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Header from "./Header";
 import Body from "./Body";
 import Figure from "./Figure";
@@ -10,8 +9,10 @@ function App() {
     <div className="App">
       <Contact />
       <Header />
-      <Figure />
-      <Body />
+      <main>
+        <Figure />
+        <Body />
+      </main>
       <Footer />
     </div>
   );

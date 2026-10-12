@@ -1,7 +1,4 @@
-import React from "react";
-
 const Header = () => {
-  const textWithNewLines = "Julian Palomino\n-\nFront End Developer";
   return (
     <header>
       <h1 className="name">Julian Palomino</h1>

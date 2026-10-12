@@ -1,25 +1,188 @@
-body {
-  background: #16171d;
-  color: aliceblue;
+:root {
+  --bg: #16171d;
+  --ink: #f0f8ff;
+  --ink-dim: #a9b1c2;
+  --orange: #ffa500;
+  --orange-deep: #ff7a00;
+  --blue: #285a94;
+  --blue-deep: #1f4877;
+  --line: #ffffff;
+
+  --font-display: "Bricolage Grotesque", "Segoe UI", sans-serif;
+  --font-body: "Inter", "Segoe UI", Tahoma, sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 3px;
+}
+
+/* ---------- Contact (orange bar, top right) ---------- */
 
 .contact {
   position: fixed;
-  top: 15px;
-  right: 15px;
+  top: 24px;
+  right: 24px;
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.contact-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  transition: color 0.2s;
+}
+
+.contact-bar {
+  display: block;
+  width: 96px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--orange);
+  transition: width 0.3s var(--ease-out);
+}
+
+.contact:hover .contact-label {
+  color: var(--orange);
+}
+
+.contact:hover .contact-bar {
+  width: 128px;
+}
+
+/* ---------- Hero: ribbon + boxes ---------- */
+
+.hero {
+  position: relative;
+  /* Matches the ribbon's viewBox so the boxes stay pinned to the ribbon */
+  aspect-ratio: 1412 / 760;
+  margin-top: clamp(1.5rem, 4vw, 4rem);
+  container-type: inline-size;
+}
+
+.ribbon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: ribbon-reveal 1.4s cubic-bezier(0.7, 0, 0.2, 1) both;
+}
+
+.slot {
+  position: absolute;
+  display: flex;
+  animation: rise 0.7s var(--ease-out) both;
+  animation-delay: calc(0.6s + var(--i) * 0.12s);
+}
+
+.slot-2 { left: 22.7%; top: 39.2%; width: 18.4%; min-height: 13.4%; }
+.slot-3 { left: 47.1%; top: 63.8%; width: 9.8%; min-height: 16.3%; }
+.slot-4 { left: 69.8%; top: 51.3%; width: 10%; min-height: 12.6%; }
+.slot-5 { left: 84%; top: 49%; width: 10%; min-height: 12.6%; }
+
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.3em;
+  padding: 0.9em 1em;
+  border: 2px solid var(--line);
+  background: rgb(22 23 29 / 0.82);
+  backdrop-filter: blur(6px);
+  text-decoration: none;
+  font-size: clamp(0.7rem, 1.05cqi, 1.05rem);
+  transition:
+    transform 0.25s var(--ease-out),
+    background-color 0.25s,
+    color 0.25s,
+    box-shadow 0.25s;
+}
+
+a.card:hover {
+  transform: translate(-4px, -4px);
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 6px 6px 0 var(--orange-deep);
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15em;
+  line-height: 1.15;
+}
+
+.slot-2 .card-title {
+  font-size: 1.6em;
+}
+
+.card-blurb {
+  color: var(--ink-dim);
+}
+
+.card-meta {
+  font-size: 0.8em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+a.card:hover .card-blurb,
+a.card:hover .card-meta {
+  color: inherit;
+}
+
+.card--soon {
+  border-style: dashed;
 }
 
 header {
+  margin-top: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   font-family: Georgia, "Times New Roman", Times, serif;
-}
-
-header {
-  margin-top: 1rem;
 }
 
 .hyphen {
@@ -30,20 +193,183 @@ header {
   margin: 5px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   transform: scaleX(0.8);
-  transformorigin: "left";
 }
 
 .name {
   margin: 5px 5px 5px 5px;
 }
 
-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-image: radial-gradient(orange, #ff7300);
+/* ---------- Body: skill blobs ---------- */
+
+.skills {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(1.5rem, 3vw, 3rem);
+  max-width: 1160px;
+  margin: clamp(4rem, 9vw, 9rem) auto;
+  padding: 0 clamp(16px, 5vw, 48px);
+}
+
+.blob {
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  background: linear-gradient(160deg, var(--blue), var(--blue-deep));
+  /* Slightly uneven corners for the hand-drawn feel of the sketch */
+  border-radius: 22px 30px 26px 34px / 30px 24px 34px 22px;
+  transition: transform 0.3s var(--ease-out);
+}
+
+.blob--alt {
+  border-radius: 30px 22px 34px 26px / 24px 32px 22px 30px;
+}
+
+.blob:hover {
+  transform: rotate(-0.6deg) translateY(-4px);
+}
+
+.blob h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  line-height: 1.1;
+}
+
+.blob p {
+  margin: 0 0 1rem;
+  color: #dbe6f5;
 }
 
 .languages {
-  color: orange;
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orange) !important;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chips li {
+  padding: 0.3rem 0.8rem;
+  border: 1.5px solid rgb(255 255 255 / 0.45);
+  border-radius: 999px;
+  font-size: 0.875rem;
+}
+
+.certs li {
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.2);
+}
+
+.certs li:last-child {
+  border-bottom: none;
+}
+
+/* ---------- Footer: orange band ---------- */
+
+footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(2.5rem, 5vw, 4rem) clamp(16px, 6vw, 96px);
+  background: var(--orange);
+  color: var(--bg);
+}
+
+.footer-lead {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 800;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1rem, 3vw, 2.5rem);
+}
+
+.footer-links a {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px
+    no-repeat;
+  transition: background-size 0.25s var(--ease-out);
+}
+
+.footer-links a:hover {
+  background-size: 100% 2px;
+}
+
+footer :focus-visible {
+  outline-color: var(--bg);
+}
+
+/* ---------- Small screens: stack the boxes over the ribbon ---------- */
+
+@media (max-width: 760px) {
+  .hero {
+    aspect-ratio: auto;
+    margin-top: 5rem;
+    padding: 2rem 16px 3rem;
+  }
+
+  .slot,
+  .slot-2,
+  .slot-3,
+  .slot-4,
+  .slot-5 {
+    position: static;
+    width: auto;
+    min-height: 0;
+  }
+
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 1.5rem;
+  }
+
+  .projects .slot-2 {
+    grid-column: 1 / -1;
+  }
+
+  .card {
+    font-size: 0.95rem;
+  }
+
+  .skills {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes ribbon-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
