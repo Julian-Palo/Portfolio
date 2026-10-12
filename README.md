@@ -7,4 +7,4 @@ My goal is to learn fast, build better. AI solutions do make an impact, an under
 made a more tremendous impact for my workflow.
 
 The Live Link:
-[placeholder]
+[julian-palomino.netlify.app]
