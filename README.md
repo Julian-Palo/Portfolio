@@ -6,5 +6,5 @@ to showcase my most valued projects
 My goal is to learn fast, build better. AI solutions do make an impact, an understanding of the fundamentals
 made a more tremendous impact for my workflow.
 
-The Live Link:
+[Visit my portfolio]
 (julian-palomino.netlify.app)
