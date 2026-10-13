@@ -11,6 +11,8 @@
   --font-display: "Bricolage Grotesque", "Segoe UI", sans-serif;
   --font-body: "Inter", "Segoe UI", Tahoma, sans-serif;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Size of the header, contact link and footer (1.75 = how they look at 175% browser zoom) */
+  --ui-scale: 1.75;
 }
 
 *,
@@ -52,18 +54,18 @@ a {
 
 .contact {
   position: fixed;
-  top: 24px;
-  right: 24px;
+  top: calc(24px * var(--ui-scale));
+  right: calc(24px * var(--ui-scale));
   z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: calc(6px * var(--ui-scale));
   text-decoration: none;
 }
 
 .contact-label {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--ui-scale));
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -73,9 +75,9 @@ a {
 
 .contact-bar {
   display: block;
-  width: 96px;
-  height: 5px;
-  border-radius: 3px;
+  width: calc(96px * var(--ui-scale));
+  height: calc(5px * var(--ui-scale));
+  border-radius: calc(3px * var(--ui-scale));
   background: var(--orange);
   transition: width 0.3s var(--ease-out);
 }
@@ -85,7 +87,7 @@ a {
 }
 
 .contact:hover .contact-bar {
-  width: 128px;
+  width: calc(128px * var(--ui-scale));
 }
 
 /* ---------- Hero: ribbon + boxes ---------- */
@@ -133,6 +135,25 @@ a {
 
 .julian.is-shown {
   opacity: 1;
+}
+
+/* Creases pulled into the ribbon by Julian's fist (drawn and moved in Figure.jsx) */
+.ribbon-grip .crease,
+.ribbon-grip .crease-light {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.ribbon-grip .crease {
+  stroke: #c95400;
+  stroke-width: 3;
+  stroke-opacity: 0.45;
+}
+
+.ribbon-grip .crease-light {
+  stroke: #ffd27a;
+  stroke-width: 2;
+  stroke-opacity: 0.55;
 }
 
 .julian-joint,
@@ -299,26 +320,27 @@ header {
   /* Fills the first screen so the ribbon only shows once you scroll */
   min-height: 100vh;
   min-height: 100svh;
-  padding: 0 16px;
+  padding: 0 calc(16px * var(--ui-scale));
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-size: calc(1em * var(--ui-scale));
   font-family: Georgia, "Times New Roman", Times, serif;
 }
 
 .hyphen {
-  margin: 5px;
+  margin: calc(5px * var(--ui-scale));
 }
 
 .jobfield {
-  margin: 5px;
+  margin: calc(5px * var(--ui-scale));
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   transform: scaleX(0.8);
 }
 
 .name {
-  margin: 5px 5px 5px 5px;
+  margin: calc(5px * var(--ui-scale));
 }
 
 /* ---------- Body: skill blobs ---------- */
@@ -439,8 +461,9 @@ footer {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-  padding: clamp(2.5rem, 5vw, 4rem) clamp(16px, 6vw, 96px);
+  gap: calc(1.5rem * var(--ui-scale));
+  padding: clamp(calc(2.5rem * var(--ui-scale)), 5vw, calc(4rem * var(--ui-scale)))
+    clamp(calc(16px * var(--ui-scale)), 6vw, calc(96px * var(--ui-scale)));
   background: var(--orange);
   color: var(--bg);
 }
@@ -448,27 +471,31 @@ footer {
 .footer-lead {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: clamp(
+    calc(1.5rem * var(--ui-scale)),
+    3vw,
+    calc(2.5rem * var(--ui-scale))
+  );
   font-weight: 800;
 }
 
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: clamp(1rem, 3vw, 2.5rem);
+  gap: clamp(calc(1rem * var(--ui-scale)), 3vw, calc(2.5rem * var(--ui-scale)));
 }
 
 .footer-links a {
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--ui-scale));
   text-decoration: none;
-  background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px
-    no-repeat;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0
+    calc(2px * var(--ui-scale)) no-repeat;
   transition: background-size 0.25s var(--ease-out);
 }
 
 .footer-links a:hover {
-  background-size: 100% 2px;
+  background-size: 100% calc(2px * var(--ui-scale));
 }
 
 footer :focus-visible {
@@ -478,6 +505,11 @@ footer :focus-visible {
 /* ---------- Small screens: stack the boxes over the ribbon ---------- */
 
 @media (max-width: 760px) {
+  /* The full desktop size crowds a phone screen */
+  :root {
+    --ui-scale: 1.25;
+  }
+
   .hero-track {
     height: auto;
   }

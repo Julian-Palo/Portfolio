@@ -72,6 +72,13 @@ const LEAD_IN_SAMPLES = 120;
 const TIP_RADIUS = 65;
 // How far inside the ribbon's edge Julian's fist sits, so it overlaps the ribbon
 const GRIP_INSET = 26;
+// How his fist squeezes the ribbon, in viewBox units: the edge is pressed in under the fist
+// and pushed out a little on either side of it
+const GRIP_SPREAD = 14; // how far along the edge the squeeze reaches
+const GRIP_DEPTH = 8;
+const GRIP_BULGE = 2.5;
+const GRIP_TUG = 1.2; // how far the squeeze slides along the edge per degree he swings
+const JULIAN_SHOWS_AT = 0.9;
 
 // Ribbon thickness at a point along the centerline (0 = start, 1 = tip of the curl).
 // Even along the tail, then swells smoothly through the curl.
@@ -88,6 +95,8 @@ const Figure = () => {
   const bodyRef = useRef(null);
   const tipRef = useRef(null);
   const julianRef = useRef(null);
+  const gripRef = useRef(null);
+  const poseGripRef = useRef(null);
 
   // Ties the ribbon's growth to scroll position: grows on the way down, shrinks on the way back up
   useEffect(() => {
@@ -140,9 +149,68 @@ const Figure = () => {
       "--grip-y",
       `${((leftmost.y - view.y) / view.height) * 100}%`,
     );
+    const gripX = leftmost.x + GRIP_INSET;
+    gripRef.current.setAttribute("opacity", 0);
+
+    // The squeeze only moves the outer edge (the side his fist is on), toward the centerline
+    const gripIndex = edges.findIndex(
+      (edge) => edge.left === leftmost || edge.right === leftmost,
+    );
+    const gripSide = edges[gripIndex].left === leftmost ? "left" : "right";
+    const along = [0];
+    for (let i = 1; i <= last; i++) {
+      along.push(
+        along[i - 1] +
+          Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y),
+      );
+    }
+    const grip = { strength: 0, angle: 0 };
+    const squeezed = (edge, i) => {
+      const s = (along[i] - along[gripIndex] - grip.angle * GRIP_TUG) / GRIP_SPREAD;
+      if (!grip.strength || Math.abs(s) > 4) return edge;
+      const bell = (x) => Math.exp(-x * x);
+      const depth =
+        grip.strength *
+        (GRIP_DEPTH * bell(s) - GRIP_BULGE * (bell(s - 2) + bell(s + 2)));
+      const inward = depth / (widths[i] / 2);
+      const side = edge[gripSide];
+      return {
+        ...edge,
+        [gripSide]: {
+          x: side.x + (points[i].x - side.x) * inward,
+          y: side.y + (points[i].y - side.y) * inward,
+        },
+      };
+    };
+
     const slots = hero.querySelectorAll(".slot");
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
+    let count = 0;
+    let progress = 0;
+
+    // Outline of the ribbon up to how far it has grown, pinched where Julian holds it
+    const draw = () => {
+      const shown = edges.slice(0, count + 1).map(squeezed);
+      const left = shown.map((edge) => toPath(edge.left));
+      const right = shown.map((edge) => toPath(edge.right)).reverse();
+      body.setAttribute(
+        "d",
+        progress > 0 ? `M${left.join("L")}L${right.join("L")}Z` : "",
+      );
+      gripRef.current.setAttribute("opacity", grip.strength);
+      gripRef.current.setAttribute(
+        "transform",
+        `translate(${gripX.toFixed(1)} ${leftmost.y.toFixed(1)}) rotate(${(grip.angle * 0.5).toFixed(2)})`,
+      );
+    };
+
+    // Julian reports each pose: how far his body has swung, and how tightly he's holding on
+    poseGripRef.current = (angle, strength) => {
+      grip.angle = angle;
+      grip.strength = strength;
+      draw();
+    };
 
     const update = () => {
       frame = 0;
@@ -160,7 +228,7 @@ const Figure = () => {
         const screen = window.innerHeight;
         raw = (screen - top) / (screen / 2 + height / 2);
       }
-      const progress = reduceMotion.matches ? 1 : Math.min(Math.max(raw, 0), 1);
+      progress = reduceMotion.matches ? 1 : Math.min(Math.max(raw, 0), 1);
 
       // Growth starts where the ribbon crosses the right edge of the screen
       const screenRight = svg.getScreenCTM();
@@ -171,15 +239,9 @@ const Figure = () => {
         0,
       );
 
-      // Outline of the ribbon up to how far it has grown
-      const count = entry + Math.round(progress * (last - entry));
-      const shown = edges.slice(0, count + 1);
-      const left = shown.map((edge) => toPath(edge.left));
-      const right = shown.map((edge) => toPath(edge.right)).reverse();
-      body.setAttribute(
-        "d",
-        progress > 0 ? `M${left.join("L")}L${right.join("L")}Z` : "",
-      );
+      count = entry + Math.round(progress * (last - entry));
+      if (progress < JULIAN_SHOWS_AT) grip.strength = 0;
+      draw();
 
       // Round cap on the growing end
       tip.setAttribute("cx", points[count].x);
@@ -239,14 +301,36 @@ const Figure = () => {
               <stop offset="55%" stopColor="#ffa500" />
               <stop offset="100%" stopColor="#ffb21a" />
             </linearGradient>
+            <radialGradient id="grip-shadow">
+              <stop offset="0%" stopColor="#7a2e00" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#7a2e00" stopOpacity="0" />
+            </radialGradient>
+            <clipPath id="ribbon-clip">
+              <use href="#ribbon-body" />
+            </clipPath>
           </defs>
           <path ref={leadInRef} d={LEAD_IN} fill="none" />
           <path ref={centerlineRef} d={CENTERLINE} fill="none" />
-          <path ref={bodyRef} fill="url(#ribbon-fill)" />
+          <path ref={bodyRef} id="ribbon-body" fill="url(#ribbon-fill)" />
           <circle ref={tipRef} fill="url(#ribbon-fill)" r="0" />
+          {/* Shadow and tension creases around Julian's fist (origin = the fist) */}
+          <g clipPath="url(#ribbon-clip)">
+            <g ref={gripRef} className="ribbon-grip" opacity="0">
+              <ellipse cx="6" cy="4" rx="40" ry="30" fill="url(#grip-shadow)" />
+              <path className="crease" d="M18 -8 C40 -22 62 -40 88 -58" />
+              <path className="crease" d="M22 2 C46 -2 70 -8 98 -12" />
+              <path className="crease" d="M18 12 C38 20 56 30 74 42" />
+              <path className="crease-light" d="M20 -3 C42 -17 64 -35 90 -53" />
+              <path className="crease-light" d="M22 7 C46 3 70 -3 96 -7" />
+            </g>
+          </g>
         </svg>
 
-        <Julian ref={julianRef} showAt={0.9} />
+        <Julian
+          ref={julianRef}
+          showAt={JULIAN_SHOWS_AT}
+          onPose={(angle, strength) => poseGripRef.current?.(angle, strength)}
+        />
 
         <ul className="projects">
           {projects.map((project) => (

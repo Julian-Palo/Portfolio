@@ -35,6 +35,7 @@ const SWING_PERIOD = 2.6; // seconds per full swing
 const SETTLE_TIME = 1.4; // seconds for the swing to shrink to about a third
 const BLINK_DELAY = 600; // ms after he stops before blinking
 const BLINK_LENGTH = 160;
+const GRIP_TIME = 0.35; // seconds for his fist to tighten on the ribbon once he appears
 
 const Joint = ({ name, children }) => (
   <div
@@ -56,14 +57,20 @@ const Layer = ({ src, className }) => (
 
 // Julian hangs from the outer edge of the ribbon by one hand. He sways while the ribbon is pinned, and once it
 // starts scrolling away the swing slowly dies out, he blinks, and he hangs still.
-// Figure.jsx drives him through `ref.update(progress)` on every scroll frame.
-const Julian = ({ ref, showAt }) => {
+// Figure.jsx drives him through `ref.update(progress)` on every scroll frame, and squeezes the
+// ribbon to match through `onPose(bodyAngle, gripStrength)`.
+const Julian = ({ ref, showAt, onPose }) => {
   const rootRef = useRef(null);
+  const onPoseRef = useRef(onPose);
+  useEffect(() => {
+    onPoseRef.current = onPose;
+  });
   const state = useRef({
     shown: false,
     settling: false,
     settled: false,
     settleStart: 0,
+    shownAt: 0,
     frame: 0,
     blink: 0,
   });
@@ -85,6 +92,13 @@ const Julian = ({ ref, showAt }) => {
         const angle = -follow * degrees * Math.sin(omega * time - lag);
         jointNodes[name].style.transform = `rotate(${angle.toFixed(2)}deg)`;
       }
+      const tighten = reduceMotion.matches
+        ? 1
+        : Math.min((performance.now() / 1000 - current.shownAt) / GRIP_TIME, 1);
+      onPoseRef.current?.(
+        degrees * Math.sin(omega * time),
+        tighten * tighten * (3 - 2 * tighten),
+      );
     };
 
     const blink = () => {
@@ -137,6 +151,9 @@ const Julian = ({ ref, showAt }) => {
     update(progress) {
       const current = state.current;
       const root = rootRef.current;
+      if (progress >= showAt && !current.shown) {
+        current.shownAt = performance.now() / 1000;
+      }
       current.shown = progress >= showAt;
       root.classList.toggle("is-shown", current.shown);
 
